@@ -1,46 +1,34 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
-from datetime import UTC, datetime
+from datetime import datetime
 
 import pytest
 
-from App.Domain.entities.expense import Expense
 from App.Domain.exceptions import InvalidExpenseError
-from App.Domain.value_objects.category import ExpenseCategory
-from App.Domain.value_objects.money import Money
 from App.Domain.value_objects.telegram_user_id import TelegramUserId
-
-
-def _expense(**overrides: object) -> Expense:
-    data: dict[str, object] = {
-        "user_id": TelegramUserId(1),
-        "amount": Money.from_text("10"),
-        "title": "mercado",
-        "category": ExpenseCategory.ALIMENTACAO,
-        "occurred_at": datetime(2026, 1, 1, 12, 0, tzinfo=UTC),
-    }
-    data.update(overrides)
-    return Expense(**data)  # type: ignore[arg-type]
+from tests.builders import make_expense
 
 
 def test_cria_gasto_valido() -> None:
-    assert _expense().title == "mercado"
+    expense = make_expense(id=7, title="mercado")
+    assert expense.title == "mercado"
+    assert expense.id.value == 7
 
 
 @pytest.mark.parametrize("title", ["", "   "])
 def test_rejeita_titulo_vazio(title: str) -> None:
     with pytest.raises(InvalidExpenseError):
-        _expense(title=title)
+        make_expense(title=title)
 
 
 def test_rejeita_data_sem_timezone() -> None:
     with pytest.raises(InvalidExpenseError):
-        _expense(occurred_at=datetime(2026, 1, 1, 12, 0))
+        make_expense(occurred_at=datetime(2026, 1, 1, 12, 0))
 
 
 def test_e_imutavel() -> None:
-    expense = _expense()
+    expense = make_expense()
     with pytest.raises(FrozenInstanceError):
         expense.title = "outro"  # type: ignore[misc]
 

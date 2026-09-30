@@ -21,6 +21,7 @@ from datetime import datetime
 from App.Application.dto.register_expense_input import ParsedGastoCommand
 from App.Domain.entities.expense import Expense
 from App.Domain.exceptions import InvalidMoneyAmountError
+from App.Domain.ports.entry_id_generator import EntryIdGenerator
 from App.Domain.ports.expense_repository import ExpenseRepository
 from App.Domain.value_objects.category import ExpenseCategory
 from App.Domain.value_objects.money import Money
@@ -62,8 +63,9 @@ def parse_gasto_command(tokens: list[str]) -> ParsedGastoCommand:
 
 
 class RegisterExpenseUseCase:
-    def __init__(self, repository: ExpenseRepository) -> None:
+    def __init__(self, repository: ExpenseRepository, id_generator: EntryIdGenerator) -> None:
         self._repository = repository
+        self._id_generator = id_generator
 
     def execute(
         self,
@@ -75,6 +77,7 @@ class RegisterExpenseUseCase:
         occurred_at: datetime,
     ) -> Expense:
         expense = Expense(
+            id=self._id_generator.next_id(),
             user_id=user_id,
             amount=amount,
             title=title,

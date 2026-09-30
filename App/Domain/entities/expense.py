@@ -13,12 +13,14 @@ from datetime import datetime
 
 from App.Domain.exceptions import InvalidExpenseError
 from App.Domain.value_objects.category import ExpenseCategory
+from App.Domain.value_objects.entry_id import EntryId
 from App.Domain.value_objects.money import Money
 from App.Domain.value_objects.telegram_user_id import TelegramUserId
 
 
 @dataclass(frozen=True, slots=True)
 class Expense:
+    id: EntryId
     user_id: TelegramUserId
     amount: Money
     title: str
