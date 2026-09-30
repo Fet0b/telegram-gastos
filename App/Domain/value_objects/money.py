@@ -21,18 +21,22 @@ class Money:
     amount: Decimal
 
     def __post_init__(self) -> None:
-        if self.amount <= 0:
+        # `is_finite()` vem antes da comparação: Decimal("NaN") <= 0 não
+        # retorna False, levanta InvalidOperation.
+        if not self.amount.is_finite() or self.amount <= 0:
             raise InvalidMoneyAmountError(str(self.amount))
 
     @classmethod
-    def from_text(cls, raw: str) -> "Money":
+    def from_text(cls, raw: str) -> Money:
         """Aceita tanto '45.90' quanto '45,90' (formato brasileiro comum)."""
         normalized = raw.strip().replace(",", ".")
         try:
             amount = Decimal(normalized).quantize(TWO_PLACES)
-        except InvalidOperation as exc:
+            return cls(amount)
+        except (InvalidOperation, InvalidMoneyAmountError) as exc:
+            # Relevanta com o texto original, para a mensagem de erro mostrar
+            # o que o usuário digitou ("-5"), e não o valor normalizado ("-5.00").
             raise InvalidMoneyAmountError(raw) from exc
-        return cls(amount)
 
     def __str__(self) -> str:
         return f"R$ {self.amount:.2f}"

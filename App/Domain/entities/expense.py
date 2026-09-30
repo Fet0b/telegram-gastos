@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from App.Domain.exceptions import InvalidExpenseError
 from App.Domain.value_objects.category import ExpenseCategory
 from App.Domain.value_objects.money import Money
 from App.Domain.value_objects.telegram_user_id import TelegramUserId
@@ -26,6 +27,6 @@ class Expense:
 
     def __post_init__(self) -> None:
         if not self.title.strip():
-            raise ValueError("O título do gasto não pode ser vazio.")
+            raise InvalidExpenseError("O título do gasto não pode ser vazio.")
         if self.occurred_at.tzinfo is None:
-            raise ValueError("occurred_at precisa ser timezone-aware.")
+            raise InvalidExpenseError("occurred_at precisa ser timezone-aware.")

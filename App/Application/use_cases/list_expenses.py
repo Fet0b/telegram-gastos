@@ -37,7 +37,8 @@ class ListExpensesUseCase:
 
         totals: dict[ExpenseCategory, Decimal] = {}
         for expense in expenses:
-            totals[expense.category] = totals.get(expense.category, Decimal("0")) + expense.amount.amount
+            current = totals.get(expense.category, Decimal("0"))
+            totals[expense.category] = current + expense.amount.amount
 
         grand_total = sum(totals.values(), Decimal("0"))
         summaries = [

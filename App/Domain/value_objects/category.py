@@ -9,6 +9,7 @@ conscientemente — não em tempo de execução.
 
 from __future__ import annotations
 
+import unicodedata
 from enum import Enum
 
 
@@ -22,7 +23,7 @@ class ExpenseCategory(str, Enum):
     OUTROS = "Outros"
 
     @classmethod
-    def from_text(cls, raw: str) -> "ExpenseCategory | None":
+    def from_text(cls, raw: str) -> ExpenseCategory | None:
         """Resolve um texto livre (case/acento-insensível) para uma categoria.
 
         Retorna None se não bater com nenhuma categoria — quem chama decide
@@ -40,7 +41,5 @@ class ExpenseCategory(str, Enum):
 
 
 def _normalize(text: str) -> str:
-    import unicodedata
-
     decomposed = unicodedata.normalize("NFKD", text.strip().lower())
     return "".join(ch for ch in decomposed if not unicodedata.combining(ch))

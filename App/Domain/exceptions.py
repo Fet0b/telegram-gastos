@@ -30,6 +30,10 @@ class InvalidMoneyAmountError(DomainError):
         super().__init__(f"Valor inválido: {amount_raw!r}. Use um número maior que zero.")
 
 
+class InvalidExpenseError(DomainError):
+    """Levantada quando os dados de um gasto violam uma regra da entidade."""
+
+
 class UnauthorizedUserError(DomainError):
     """Levantada quando um usuário do Telegram não está na allowlist."""
 
